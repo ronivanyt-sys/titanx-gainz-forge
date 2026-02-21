@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_percent: number
+          id: string
+          min_amount: number
+          uses_remaining: number | null
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          min_amount?: number
+          uses_remaining?: number | null
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_percent?: number
+          id?: string
+          min_amount?: number
+          uses_remaining?: number | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           benefits: string[]
@@ -85,6 +115,79 @@ export type Database = {
           usage_instructions?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          author_name: string
+          comment: string
+          created_at: string
+          id: string
+          product_id: string
+          rating: number
+        }
+        Insert: {
+          author_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          product_id: string
+          rating?: number
+        }
+        Update: {
+          author_name?: string
+          comment?: string
+          created_at?: string
+          id?: string
+          product_id?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales_log: {
+        Row: {
+          created_at: string
+          customer_name: string
+          id: string
+          notes: string
+          product_id: string
+          quantity: number
+          sale_price: number
+        }
+        Insert: {
+          created_at?: string
+          customer_name?: string
+          id?: string
+          notes?: string
+          product_id: string
+          quantity?: number
+          sale_price?: number
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          id?: string
+          notes?: string
+          product_id?: string
+          quantity?: number
+          sale_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_log_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {

@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle, Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { toast } from "@/hooks/use-toast";
 import { WHATSAPP_NUMBER, cartWhatsAppMessage } from "@/lib/whatsapp";
+import { supabase } from "@/integrations/supabase/client";
+
 const cities = ["Santa Cruz", "La Paz", "Cochabamba", "Sucre", "Oruro", "Potosí", "Tarija", "Trinidad", "Cobija"];
 const payments = ["Transferencia bancaria", "QR", "Coordinación por WhatsApp"];
 
@@ -14,6 +16,9 @@ const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", phone: "", city: "", address: "", payment: "" });
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_percent: number; id: string } | null>(null);
+  const [applyingCoupon, setApplyingCoupon] = useState(false);
 
   if (items.length === 0) {
     return (
@@ -26,14 +31,55 @@ const Checkout = () => {
     );
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const discount = appliedCoupon ? Math.round(subtotal * appliedCoupon.discount_percent / 100) : 0;
+  const total = subtotal - discount;
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setApplyingCoupon(true);
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("code", couponCode.toUpperCase().trim())
+      .eq("active", true)
+      .maybeSingle();
+
+    if (error || !data) {
+      toast({ title: "Cupón inválido", description: "El código no existe o no está activo", variant: "destructive" });
+    } else if (data.min_amount && subtotal < Number(data.min_amount)) {
+      toast({ title: "Monto insuficiente", description: `El mínimo para este cupón es Bs ${data.min_amount}`, variant: "destructive" });
+    } else if (data.uses_remaining !== null && data.uses_remaining <= 0) {
+      toast({ title: "Cupón agotado", variant: "destructive" });
+    } else {
+      setAppliedCoupon({ code: data.code, discount_percent: data.discount_percent, id: data.id });
+      toast({ title: `¡Cupón aplicado! -${data.discount_percent}%` });
+    }
+    setApplyingCoupon(false);
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode("");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.phone || !form.city || !form.address || !form.payment) {
       toast({ title: "Error", description: "Por favor completa todos los campos", variant: "destructive" });
       return;
     }
+
+    // Decrement coupon uses if applicable
+    if (appliedCoupon) {
+      const { data: coupon } = await supabase.from("coupons").select("uses_remaining").eq("id", appliedCoupon.id).maybeSingle();
+      if (coupon?.uses_remaining !== null && coupon?.uses_remaining !== undefined) {
+        await supabase.from("coupons").update({ uses_remaining: coupon.uses_remaining - 1 }).eq("id", appliedCoupon.id);
+      }
+    }
+
     const productDetails = cartWhatsAppMessage(items, subtotal);
-    const msg = `${productDetails}\n\nNombre: ${form.name}\nDirección: ${form.address}\nCelular: ${form.phone}\nCiudad: ${form.city}\nPago: ${form.payment}`;
+    const couponLine = appliedCoupon ? `\nCupón: ${appliedCoupon.code} (-${appliedCoupon.discount_percent}% = -Bs ${discount})` : "";
+    const msg = `${productDetails}${couponLine}\n\n💰 Total: Bs ${total}\n\nNombre: ${form.name}\nDirección: ${form.address}\nCelular: ${form.phone}\nCiudad: ${form.city}\nPago: ${form.payment}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     clearCart();
     toast({ title: "¡Pedido enviado!", description: "Tu pedido fue enviado por WhatsApp." });
@@ -77,8 +123,8 @@ const Checkout = () => {
           </form>
 
           <div className="lg:col-span-2">
-            <div className="bg-gradient-card border border-border rounded-lg p-6 sticky top-24">
-              <h3 className="font-display text-xl mb-4">Resumen del Pedido</h3>
+            <div className="bg-gradient-card border border-border rounded-lg p-6 sticky top-24 space-y-4">
+              <h3 className="font-display text-xl">Resumen del Pedido</h3>
               <div className="space-y-3">
                 {items.map(({ product, quantity }) => (
                   <div key={product.id} className="flex justify-between text-sm">
@@ -87,9 +133,41 @@ const Checkout = () => {
                   </div>
                 ))}
               </div>
-              <div className="border-t border-border mt-4 pt-4 flex justify-between font-display text-xl">
-                <span>Total</span>
-                <span className="text-primary">Bs {subtotal}</span>
+
+              {/* Coupon */}
+              <div className="border-t border-border pt-3">
+                {appliedCoupon ? (
+                  <div className="flex items-center justify-between bg-primary/10 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Tag className="w-4 h-4 text-primary" />
+                      <span className="font-mono font-bold text-primary">{appliedCoupon.code}</span>
+                      <span className="text-muted-foreground">-{appliedCoupon.discount_percent}%</span>
+                    </div>
+                    <button onClick={removeCoupon}><X className="w-4 h-4 text-muted-foreground hover:text-foreground" /></button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input placeholder="Código de cupón" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="bg-background border-border text-sm" onKeyDown={e => e.key === "Enter" && (e.preventDefault(), applyCoupon())} />
+                    <Button type="button" variant="outline" size="sm" onClick={applyCoupon} disabled={applyingCoupon}>Aplicar</Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-border pt-3 space-y-1">
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>Subtotal</span>
+                  <span>Bs {subtotal}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-sm text-primary">
+                    <span>Descuento</span>
+                    <span>-Bs {discount}</span>
+                  </div>
+                )}
+                <div className="flex justify-between font-display text-xl pt-2">
+                  <span>Total</span>
+                  <span className="text-primary">Bs {total}</span>
+                </div>
               </div>
             </div>
           </div>

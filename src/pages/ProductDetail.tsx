@@ -5,9 +5,11 @@ import { ShoppingCart, MessageCircle, Star, Minus, Plus, ArrowLeft, CheckCircle,
 import { Button } from "@/components/ui/button";
 import CountdownTimer from "@/components/CountdownTimer";
 import ProductCard from "@/components/ProductCard";
+import ProductReviews from "@/components/ProductReviews";
 import { useCart } from "@/context/CartContext";
 import { useProducts } from "@/hooks/useProducts";
 import { buildWhatsAppLink, productWhatsAppMessage } from "@/lib/whatsapp";
+import { useSEO } from "@/hooks/useSEO";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -16,12 +18,14 @@ const ProductDetail = () => {
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
 
+  useSEO({
+    title: product?.name ?? "Producto",
+    description: product?.description?.slice(0, 155),
+    image: product?.image,
+  });
+
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   if (!product) {
@@ -88,7 +92,6 @@ const ProductDetail = () => {
 
             <p className="text-foreground/80">{product.description}</p>
 
-            {/* Stock */}
             <div className="flex items-center gap-2">
               {product.stock > 0 ? (
                 <>
@@ -100,7 +103,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Quantity + Actions */}
             {product.stock > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
@@ -124,7 +126,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Benefits */}
             {product.benefits.length > 0 && (
               <div className="border-t border-border pt-6">
                 <h3 className="font-display text-xl mb-3">Beneficios</h3>
@@ -138,7 +139,6 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Ingredients & Usage */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-border pt-6">
               {product.ingredients && (
                 <div>
@@ -155,6 +155,9 @@ const ProductDetail = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Reviews */}
+        <ProductReviews productId={product.id} />
 
         {/* Related */}
         {related.length > 0 && (
