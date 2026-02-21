@@ -40,15 +40,15 @@ const Contact = () => {
             <div className="bg-gradient-card border border-border rounded-lg p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm">Bolivia</span>
+                <span className="text-sm">Calle Genesis #24, Ciudad de Potosí, Bolivia</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm">+591 12345678</span>
+                <span className="text-sm">+591 60452794</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm">info@titanx.bo</span>
+                <span className="text-sm">contacto@titanxbolivia.shop</span>
               </div>
             </div>
 
