@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
-
-const WHATSAPP_NUMBER = "59112345678";
+import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });

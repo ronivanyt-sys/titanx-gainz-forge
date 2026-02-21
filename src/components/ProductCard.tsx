@@ -5,8 +5,7 @@ import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 import CountdownTimer from "./CountdownTimer";
 import { Button } from "@/components/ui/button";
-
-const WHATSAPP_NUMBER = "59112345678";
+import { buildWhatsAppLink, productWhatsAppMessage } from "@/lib/whatsapp";
 
 const StockBadge = ({ stock }: { stock: number }) => {
   if (stock === 0) return <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/20 text-destructive">Agotado</span>;
@@ -16,7 +15,7 @@ const StockBadge = ({ stock }: { stock: number }) => {
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addItem } = useCart();
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola, quiero comprar ${product.name}`)}`;
+  const whatsappLink = buildWhatsAppLink(productWhatsAppMessage(product));
   const hasDiscount = product.discountPrice || product.countdown?.active;
   const finalPrice = product.discountPrice ?? (product.countdown?.active ? Math.round(product.price * (1 - product.countdown.discountPercent / 100)) : product.price);
 

@@ -7,8 +7,7 @@ import CountdownTimer from "@/components/CountdownTimer";
 import ProductCard from "@/components/ProductCard";
 import { useCart } from "@/context/CartContext";
 import { products } from "@/data/products";
-
-const WHATSAPP_NUMBER = "59112345678";
+import { buildWhatsAppLink, productWhatsAppMessage } from "@/lib/whatsapp";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -30,7 +29,7 @@ const ProductDetail = () => {
   const hasDiscount = product.discountPrice || product.countdown?.active;
   const finalPrice = product.discountPrice ?? (product.countdown?.active ? Math.round(product.price * (1 - product.countdown.discountPercent / 100)) : product.price);
   const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`Hola, quiero comprar ${product.name} (x${qty})`)}`;
+  const whatsappLink = buildWhatsAppLink(productWhatsAppMessage(product) + `\n\n📊 Cantidad: ${qty}`);
 
   return (
     <div className="min-h-screen py-10">
