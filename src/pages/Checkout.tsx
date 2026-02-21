@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/context/CartContext";
 import { toast } from "@/hooks/use-toast";
-
-const WHATSAPP_NUMBER = "59112345678";
+import { WHATSAPP_NUMBER, cartWhatsAppMessage } from "@/lib/whatsapp";
 const cities = ["Santa Cruz", "La Paz", "Cochabamba", "Sucre", "Oruro", "Potosí", "Tarija", "Trinidad", "Cobija"];
 const payments = ["Transferencia bancaria", "QR", "Coordinación por WhatsApp"];
 
@@ -33,8 +32,8 @@ const Checkout = () => {
       toast({ title: "Error", description: "Por favor completa todos los campos", variant: "destructive" });
       return;
     }
-    const orderLines = items.map(i => `• ${i.product.name} x${i.quantity} - Bs ${(i.product.discountPrice ?? i.product.price) * i.quantity}`).join("\n");
-    const msg = `🛒 *Nuevo Pedido TitanX*\n\n${orderLines}\n\n💰 Total: Bs ${subtotal}\n\n👤 ${form.name}\n📱 ${form.phone}\n🏙 ${form.city}\n📍 ${form.address}\n💳 ${form.payment}`;
+    const productDetails = cartWhatsAppMessage(items, subtotal);
+    const msg = `${productDetails}\n\n👤 ${form.name}\n📱 ${form.phone}\n🏙 ${form.city}\n📍 ${form.address}\n💳 ${form.payment}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     clearCart();
     toast({ title: "¡Pedido enviado!", description: "Tu pedido fue enviado por WhatsApp." });

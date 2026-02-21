@@ -2,8 +2,7 @@ import { motion } from "framer-motion";
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-fitness.jpg";
-
-const WHATSAPP_NUMBER = "59112345678";
+import { buildWhatsAppLink } from "@/lib/whatsapp";
 
 const HeroSection = () => (
   <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -40,7 +39,7 @@ const HeroSection = () => (
 
         <div className="flex flex-wrap gap-4">
           <Button size="lg" className="glow-red gap-2 text-lg px-8 font-display tracking-wider" asChild>
-            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hola, quiero información sobre productos TitanX")}`} target="_blank" rel="noopener noreferrer">
+            <a href={buildWhatsAppLink("Hola, quiero información sobre productos TitanX")} target="_blank" rel="noopener noreferrer">
               <MessageCircle className="w-5 h-5" /> Comprar por WhatsApp
             </a>
           </Button>
