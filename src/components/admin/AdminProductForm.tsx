@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useCategories } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
@@ -11,18 +12,18 @@ interface Props {
   onSaved: () => void;
 }
 
-const categories = ["Proteína", "Creatina", "Pre-entreno", "Quemadores"];
-
 const AdminProductForm = ({ product, onClose, onSaved }: Props) => {
   const isEdit = !!product;
+  const { data: existingCategories = [] } = useCategories();
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
   const [form, setForm] = useState({
     name: product?.name ?? "",
     slug: product?.slug ?? "",
     description: product?.description ?? "",
     short_benefit: product?.short_benefit ?? "",
-    category: product?.category ?? "Proteína",
+    category: product?.category ?? (existingCategories[0] || ""),
     price: product?.price ?? 0,
     discount_price: product?.discount_price ?? "",
     image: product?.image ?? "",
@@ -44,6 +45,14 @@ const AdminProductForm = ({ product, onClose, onSaved }: Props) => {
     set("name", name);
     if (!isEdit) {
       set("slug", name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
+    }
+  };
+
+  const handleAddCategory = () => {
+    const trimmed = newCategory.trim();
+    if (trimmed && !existingCategories.includes(trimmed)) {
+      set("category", trimmed);
+      setNewCategory("");
     }
   };
 
@@ -108,6 +117,9 @@ const AdminProductForm = ({ product, onClose, onSaved }: Props) => {
     }
   };
 
+  // Merge existing categories with potentially new one
+  const allCategories = [...new Set([...existingCategories, form.category].filter(Boolean))].sort();
+
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-card border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 relative">
@@ -142,8 +154,20 @@ const AdminProductForm = ({ product, onClose, onSaved }: Props) => {
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">Categoría</label>
               <select value={form.category} onChange={e => set("category", e.target.value)} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground">
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
+              <div className="flex gap-1 mt-1">
+                <Input
+                  placeholder="Nueva categoría"
+                  value={newCategory}
+                  onChange={e => setNewCategory(e.target.value)}
+                  className="bg-background border-border text-xs h-7"
+                  onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); handleAddCategory(); } }}
+                />
+                <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2" onClick={handleAddCategory}>
+                  +
+                </Button>
+              </div>
             </div>
             <div>
               <label className="text-sm text-muted-foreground mb-1 block">Precio (Bs)</label>

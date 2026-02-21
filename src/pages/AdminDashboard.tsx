@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   const [search, setSearch] = useState("");
 
   const { data: products = [], isLoading } = useQuery({
-    queryKey: ["admin-products"],
+    queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
       if (error) throw error;
@@ -32,7 +32,8 @@ const AdminDashboard = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product-categories"] });
       toast({ title: "Producto eliminado" });
     },
   });
@@ -100,7 +101,8 @@ const AdminDashboard = () => {
             onSaved={() => {
               setShowForm(false);
               setEditingProduct(null);
-              queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+              queryClient.invalidateQueries({ queryKey: ["products"] });
+              queryClient.invalidateQueries({ queryKey: ["product-categories"] });
             }}
           />
         )}

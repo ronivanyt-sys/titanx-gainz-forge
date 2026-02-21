@@ -1,18 +1,20 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import ProductFilters from "@/components/ProductFilters";
-import { products } from "@/data/products";
+import { useProducts, useCategories } from "@/hooks/useProducts";
 
 const Products = () => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [benefit, setBenefit] = useState("");
+
+  const { data: products = [], isLoading } = useProducts();
+  const { data: categories = [] } = useCategories();
 
   const filtered = products.filter(p => {
     if (search && !p.name.toLowerCase().includes(search.toLowerCase())) return false;
     if (category && p.category !== category) return false;
-    if (benefit && p.benefit !== benefit) return false;
     return true;
   });
 
@@ -31,11 +33,13 @@ const Products = () => {
           <ProductFilters
             search={search} onSearchChange={setSearch}
             category={category} onCategoryChange={setCategory}
-            benefit={benefit} onBenefitChange={setBenefit}
+            categories={categories}
           />
         </div>
 
-        {filtered.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+        ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-20">No se encontraron productos</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

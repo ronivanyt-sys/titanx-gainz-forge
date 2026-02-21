@@ -1,19 +1,28 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ShoppingCart, MessageCircle, Star, Minus, Plus, ArrowLeft, CheckCircle } from "lucide-react";
+import { ShoppingCart, MessageCircle, Star, Minus, Plus, ArrowLeft, CheckCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CountdownTimer from "@/components/CountdownTimer";
 import ProductCard from "@/components/ProductCard";
 import { useCart } from "@/context/CartContext";
-import { products } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import { buildWhatsAppLink, productWhatsAppMessage } from "@/lib/whatsapp";
 
 const ProductDetail = () => {
   const { slug } = useParams();
+  const { data: products = [], isLoading } = useProducts();
   const product = products.find(p => p.slug === slug);
   const { addItem } = useCart();
   const [qty, setQty] = useState(1);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -116,48 +125,36 @@ const ProductDetail = () => {
             )}
 
             {/* Benefits */}
-            <div className="border-t border-border pt-6">
-              <h3 className="font-display text-xl mb-3">Beneficios</h3>
-              <ul className="space-y-2">
-                {product.benefits.map(b => (
-                  <li key={b} className="flex items-center gap-2 text-sm">
-                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" /> {b}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {product.benefits.length > 0 && (
+              <div className="border-t border-border pt-6">
+                <h3 className="font-display text-xl mb-3">Beneficios</h3>
+                <ul className="space-y-2">
+                  {product.benefits.map(b => (
+                    <li key={b} className="flex items-center gap-2 text-sm">
+                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" /> {b}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Ingredients & Usage */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-border pt-6">
-              <div>
-                <h3 className="font-display text-xl mb-2">Ingredientes</h3>
-                <p className="text-sm text-muted-foreground">{product.ingredients}</p>
-              </div>
-              <div>
-                <h3 className="font-display text-xl mb-2">Modo de Uso</h3>
-                <p className="text-sm text-muted-foreground">{product.usage}</p>
-              </div>
+              {product.ingredients && (
+                <div>
+                  <h3 className="font-display text-xl mb-2">Ingredientes</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">{product.ingredients}</p>
+                </div>
+              )}
+              {product.usage && (
+                <div>
+                  <h3 className="font-display text-xl mb-2">Modo de Uso</h3>
+                  <p className="text-sm text-muted-foreground whitespace-pre-line">{product.usage}</p>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
-
-        {/* Reviews */}
-        <section className="mt-16">
-          <h2 className="font-display text-3xl mb-6">Reseñas de Clientes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {product.reviews.map(r => (
-              <div key={r.id} className="bg-gradient-card border border-border rounded-lg p-5">
-                <div className="flex gap-0.5 mb-2">
-                  {Array.from({ length: r.rating }).map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
-                  ))}
-                </div>
-                <p className="text-sm text-foreground/80 mb-3">"{r.comment}"</p>
-                <p className="text-xs text-muted-foreground">{r.author} · {r.date}</p>
-              </div>
-            ))}
-          </div>
-        </section>
 
         {/* Related */}
         {related.length > 0 && (
