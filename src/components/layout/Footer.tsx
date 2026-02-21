@@ -29,9 +29,9 @@ const Footer = () => (
         <div>
           <h4 className="font-display text-lg mb-3">Contacto</h4>
           <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-            <span>📍 Bolivia</span>
-            <span>📱 +591 12345678</span>
-            <span>✉️ info@titanx.bo</span>
+            <span>📍 Calle Genesis #24, Ciudad de Potosí, Bolivia</span>
+            <span>📱 +591 60452794</span>
+            <span>✉️ contacto@titanxbolivia.shop</span>
           </div>
         </div>
       </div>
