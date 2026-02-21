@@ -7,10 +7,16 @@ import ProductCard from "@/components/ProductCard";
 import BenefitsSection from "@/components/BenefitsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import { useProducts } from "@/hooks/useProducts";
+import { useSEO } from "@/hooks/useSEO";
 
 const Index = () => {
   const { data: products = [], isLoading } = useProducts();
   const featured = products.filter((p) => p.featured);
+
+  useSEO({
+    title: "Suplementos Deportivos Premium en Bolivia",
+    description: "TitanX Bolivia - Los mejores suplementos deportivos: proteínas, creatina, pre-workout y más. Envíos a todo Bolivia.",
+  });
 
   return (
     <div>
