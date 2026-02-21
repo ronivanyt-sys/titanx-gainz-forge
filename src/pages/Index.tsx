@@ -8,7 +8,7 @@ import BenefitsSection from "@/components/BenefitsSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import { products } from "@/data/products";
 
-const featured = products.filter(p => p.featured);
+const featured = products.filter((p) => p.featured);
 
 const Index = () => (
   <div>
@@ -26,20 +26,26 @@ const Index = () => (
             <h2 className="font-display text-4xl md:text-5xl">
               Productos <span className="text-gradient-red">Destacados</span>
             </h2>
-            <p className="text-muted-foreground mt-2">Los favoritos de nuestros atletas</p>
+            <p className="text-muted-foreground mt-2">Los mejores suplementos de Bolivia solo para ti</p>
           </div>
           <Button variant="ghost" className="hidden sm:flex gap-1 text-primary" asChild>
-            <Link to="/productos">Ver todos <ArrowRight className="w-4 h-4" /></Link>
+            <Link to="/productos">
+              Ver todos <ArrowRight className="w-4 h-4" />
+            </Link>
           </Button>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map(p => <ProductCard key={p.id} product={p} />)}
+          {featured.map((p) => (
+            <ProductCard key={p.id} product={p} />
+          ))}
         </div>
 
         <div className="sm:hidden mt-6 text-center">
           <Button variant="outline" className="gap-1" asChild>
-            <Link to="/productos">Ver todos los productos <ArrowRight className="w-4 h-4" /></Link>
+            <Link to="/productos">
+              Ver todos los productos <ArrowRight className="w-4 h-4" />
+            </Link>
           </Button>
         </div>
       </div>
