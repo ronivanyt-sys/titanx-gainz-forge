@@ -33,7 +33,7 @@ const Checkout = () => {
       return;
     }
     const productDetails = cartWhatsAppMessage(items, subtotal);
-    const msg = `${productDetails}\n\n👤 ${form.name}\n📱 ${form.phone}\n🏙 ${form.city}\n📍 ${form.address}\n💳 ${form.payment}`;
+    const msg = `${productDetails}\n\nNombre: ${form.name}\nDirección: ${form.address}\nCelular: ${form.phone}\nCiudad: ${form.city}\nPago: ${form.payment}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, "_blank");
     clearCart();
     toast({ title: "¡Pedido enviado!", description: "Tu pedido fue enviado por WhatsApp." });
