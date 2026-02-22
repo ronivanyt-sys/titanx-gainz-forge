@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useCategories } from "@/hooks/useProducts";
+import SocialIcons from "@/components/SocialIcons";
 
 const Footer = () => {
   const { data: categories = [] } = useCategories();
@@ -41,6 +42,7 @@ const Footer = () => {
               <span>📱 +591 60452794</span>
               <span>✉️ contacto@titanxbolivia.shop</span>
             </div>
+            <SocialIcons className="mt-3" />
           </div>
         </div>
         <div className="border-t border-border mt-8 pt-6 text-center text-xs text-muted-foreground">

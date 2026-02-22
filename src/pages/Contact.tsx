@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import SocialIcons from "@/components/SocialIcons";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
@@ -57,6 +58,11 @@ const Contact = () => {
                 <MessageCircle className="w-5 h-5" /> Escribir por WhatsApp
               </a>
             </Button>
+
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-2">Síguenos en redes sociales</p>
+              <SocialIcons className="justify-center" />
+            </div>
           </motion.div>
         </div>
       </div>

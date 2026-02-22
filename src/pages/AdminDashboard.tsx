@@ -6,13 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, LogOut, Plus, Pencil, Trash2, Package, AlertTriangle, Tag, ShoppingBag, Ticket, LayoutGrid } from "lucide-react";
+import { Loader2, LogOut, Plus, Pencil, Trash2, Package, AlertTriangle, Tag, ShoppingBag, Ticket, LayoutGrid, Share2 } from "lucide-react";
 import AdminProductForm from "@/components/admin/AdminProductForm";
 import AdminSalesLog from "@/components/admin/AdminSalesLog";
 import AdminCoupons from "@/components/admin/AdminCoupons";
 import AdminCategories from "@/components/admin/AdminCategories";
+import AdminSocialLinks from "@/components/admin/AdminSocialLinks";
 
-type Tab = "products" | "sales" | "coupons" | "categories";
+type Tab = "products" | "sales" | "coupons" | "categories" | "social";
 
 const AdminDashboard = () => {
   const { user, isAdmin, loading, signOut } = useAuth();
@@ -60,6 +61,7 @@ const AdminDashboard = () => {
     { key: "categories", label: "Categorías", icon: LayoutGrid },
     { key: "sales", label: "Ventas", icon: ShoppingBag },
     { key: "coupons", label: "Cupones", icon: Ticket },
+    { key: "social", label: "Redes", icon: Share2 },
   ];
 
   return (
@@ -196,6 +198,7 @@ const AdminDashboard = () => {
         {tab === "categories" && <AdminCategories />}
         {tab === "sales" && <AdminSalesLog />}
         {tab === "coupons" && <AdminCoupons />}
+        {tab === "social" && <AdminSocialLinks />}
       </div>
     </div>
   );
