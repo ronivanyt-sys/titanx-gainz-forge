@@ -31,11 +31,17 @@ const ProductReviews = ({ productId }: Props) => {
 
   const addReview = useMutation({
     mutationFn: async () => {
+      const authorName = form.author_name.trim().slice(0, 100) || "Anónimo";
+      const comment = form.comment.trim().slice(0, 1000);
+      const rating = Math.min(5, Math.max(1, Math.round(form.rating)));
+
+      if (!comment) throw new Error("El comentario no puede estar vacío");
+
       const { error } = await supabase.from("reviews").insert({
         product_id: productId,
-        author_name: form.author_name.trim() || "Anónimo",
-        rating: form.rating,
-        comment: form.comment.trim(),
+        author_name: authorName,
+        rating,
+        comment,
       });
       if (error) throw error;
     },
@@ -62,7 +68,7 @@ const ProductReviews = ({ productId }: Props) => {
 
       {showForm && (
         <div className="bg-card border border-border rounded-lg p-4 mb-6 space-y-3">
-          <Input placeholder="Tu nombre (opcional)" value={form.author_name} onChange={e => setForm(prev => ({ ...prev, author_name: e.target.value }))} className="bg-background border-border" />
+          <Input placeholder="Tu nombre (opcional)" maxLength={100} value={form.author_name} onChange={e => setForm(prev => ({ ...prev, author_name: e.target.value }))} className="bg-background border-border" />
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Calificación:</span>
             <div className="flex gap-1">
@@ -73,7 +79,7 @@ const ProductReviews = ({ productId }: Props) => {
               ))}
             </div>
           </div>
-          <Textarea placeholder="Tu comentario..." value={form.comment} onChange={e => setForm(prev => ({ ...prev, comment: e.target.value }))} className="bg-background border-border" />
+          <Textarea placeholder="Tu comentario..." maxLength={1000} value={form.comment} onChange={e => setForm(prev => ({ ...prev, comment: e.target.value }))} className="bg-background border-border" />
           <div className="flex gap-2">
             <Button onClick={() => addReview.mutate()} disabled={!form.comment.trim() || addReview.isPending}>
               {addReview.isPending && <Loader2 className="w-4 h-4 animate-spin mr-1" />} Enviar
