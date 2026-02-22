@@ -249,7 +249,12 @@ export type Database = {
         }
         Returns: boolean
       }
-      use_coupon: { Args: { _coupon_id: string }; Returns: undefined }
+      use_coupon:
+        | { Args: { _coupon_id: string }; Returns: undefined }
+        | {
+            Args: { _coupon_id: string; _order_amount?: number }
+            Returns: boolean
+          }
     }
     Enums: {
       app_role: "admin" | "user"

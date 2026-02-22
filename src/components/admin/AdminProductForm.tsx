@@ -56,11 +56,25 @@ const AdminProductForm = ({ product, onClose, onSaved }: Props) => {
     }
   };
 
+  const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast({ title: "Error", description: "Solo se permiten imágenes (JPG, PNG, WEBP)", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      toast({ title: "Error", description: "La imagen no puede exceder 5MB", variant: "destructive" });
+      return;
+    }
+
     setUploading(true);
-    const ext = file.name.split(".").pop();
+    const ext = file.type.split('/').pop() || 'jpg';
     const path = `${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("product-images").upload(path, file);
     if (error) {
