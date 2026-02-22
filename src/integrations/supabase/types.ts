@@ -249,6 +249,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      use_coupon: { Args: { _coupon_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

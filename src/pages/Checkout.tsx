@@ -69,12 +69,9 @@ const Checkout = () => {
       return;
     }
 
-    // Decrement coupon uses if applicable
+    // Decrement coupon uses server-side via secure RPC
     if (appliedCoupon) {
-      const { data: coupon } = await supabase.from("coupons").select("uses_remaining").eq("id", appliedCoupon.id).maybeSingle();
-      if (coupon?.uses_remaining !== null && coupon?.uses_remaining !== undefined) {
-        await supabase.from("coupons").update({ uses_remaining: coupon.uses_remaining - 1 }).eq("id", appliedCoupon.id);
-      }
+      await supabase.rpc("use_coupon", { _coupon_id: appliedCoupon.id });
     }
 
     const productDetails = cartWhatsAppMessage(items, subtotal);
