@@ -48,7 +48,7 @@ const Index = () => {
           ) : featured.length === 0 ? (
             <p className="text-center text-muted-foreground py-12">No hay productos destacados aún</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {featured.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
