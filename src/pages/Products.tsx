@@ -42,7 +42,7 @@ const Products = () => {
         ) : filtered.length === 0 ? (
           <p className="text-center text-muted-foreground py-20">No se encontraron productos</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {filtered.map(p => <ProductCard key={p.id} product={p} />)}
           </div>
         )}
