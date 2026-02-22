@@ -69,9 +69,13 @@ const Checkout = () => {
       return;
     }
 
-    // Decrement coupon uses server-side via secure RPC
+    // Decrement coupon uses server-side via secure RPC with amount validation
     if (appliedCoupon) {
-      await supabase.rpc("use_coupon", { _coupon_id: appliedCoupon.id });
+      const { data: success } = await supabase.rpc("use_coupon", { _coupon_id: appliedCoupon.id, _order_amount: subtotal });
+      if (!success) {
+        toast({ title: "Error con el cupón", description: "El cupón ya no es válido", variant: "destructive" });
+        return;
+      }
     }
 
     const productDetails = cartWhatsAppMessage(items, subtotal);
